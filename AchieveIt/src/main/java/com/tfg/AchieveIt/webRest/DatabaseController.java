@@ -37,10 +37,10 @@ public class DatabaseController {
     @GetMapping("/dbFill")
     public void FillDatabase() {
         try {
-            /*FillGenres();
+            FillGenres();
             FillPlatforms();
             FillDevelopersPublishers();
-            FillVideogames();*/
+            FillVideogames();
             FillAchievements();
         } catch (Exception e) {}
     }

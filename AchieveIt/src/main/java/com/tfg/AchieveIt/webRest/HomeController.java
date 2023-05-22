@@ -1,6 +1,5 @@
 package com.tfg.AchieveIt.webRest;
 
-import com.tfg.AchieveIt.domain.Developer;
 import com.tfg.AchieveIt.services.DeveloperServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +17,6 @@ public class HomeController {
 
     @GetMapping("/Home")
     public String getHome(){
-
-        developerServices.fillDeveloper(new Developer("Nuremberg"));
-        developerServices.fillDeveloper(new Developer("asdasdas"));
 
         return "aaaaaaaaaa";
     }
