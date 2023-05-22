@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    username: SYSTEM
+    password: Achieveit70_
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 509525323414-mtr2l2kuoalgs86gje4ri6osmmfj9ejv.apps.googleusercontent.com
+            clientSecret: "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"
+            scope:
+              - email
+              - profile
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.OracleDialect
