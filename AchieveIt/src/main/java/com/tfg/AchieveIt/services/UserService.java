@@ -3,6 +3,9 @@ package com.tfg.AchieveIt.services;
 import com.tfg.AchieveIt.domain.User;
 import com.tfg.AchieveIt.repository.UserRepository;
 import com.tfg.AchieveIt.webRest.security.CustomOAuth2User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,5 +32,16 @@ public class UserService {
             newUser.setUserName("userName");
             userRepository.save(newUser);
         }
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) authentication.getPrincipal();
+
+        String email = principal.getAttribute("email");
+        String name = principal.getAttribute("name");
+
+        User user = userRepository.findUserByEmail(email);
+        return user;
     }
 }

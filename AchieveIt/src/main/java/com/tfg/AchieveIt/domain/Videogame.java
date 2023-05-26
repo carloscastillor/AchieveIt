@@ -45,6 +45,9 @@ public class Videogame {
     )
     Set<Platform> platforms;
 
+    @ManyToMany(mappedBy = "videogames")
+    Set<User> users;
+
     public Videogame(String name){
         this.name = name;
     }

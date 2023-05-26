@@ -1,6 +1,8 @@
 package com.tfg.AchieveIt.domain;
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "user_table")
 public class User {
@@ -24,6 +26,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     private Provider provider;
+
+    @ManyToMany(targetEntity = Videogame.class)
+    @JoinTable(
+            name = "user_videogame",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "videogame_id")
+    )
+    Set<Videogame> videogames;
 
     public User(String userName, String name, String email) {
         this.userName = userName;
@@ -62,4 +72,14 @@ public class User {
     public Provider getProvider() {return provider;}
 
     public void setProvider(Provider provider) {this.provider = provider;}
+
+    public Set<Videogame> getVideogames() {
+        return videogames;
+    }
+
+    public void setVideogames(Set<Videogame> videogames) {
+        this.videogames = videogames;
+    }
+
+    public void addVideogame(Videogame videogame){this.videogames.add(videogame);}
 }

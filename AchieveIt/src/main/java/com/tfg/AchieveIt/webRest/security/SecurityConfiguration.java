@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                 .authorizeRequests()
                 .requestMatchers("/login/**").permitAll()
                 .anyRequest().permitAll()
+                //.anyRequest().authenticated()
                 .and()
                 .oauth2Login()
                 .successHandler(new AuthenticationSuccessHandler() {

@@ -1,9 +1,12 @@
 package com.tfg.AchieveIt.webRest;
 
 import com.tfg.AchieveIt.domain.*;
+import com.tfg.AchieveIt.repository.UserRepository;
 import com.tfg.AchieveIt.repository.VideogameRepository;
+import com.tfg.AchieveIt.services.UserService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -11,10 +14,14 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:5173")
 public class VideogameController {
 
+    private final UserService userService;
+    private final UserRepository userRepository;
     private final VideogameRepository videogameRepository;
 
 
-    public VideogameController(VideogameRepository videogameRepository) {
+    public VideogameController(UserService userService, UserRepository userRepository, VideogameRepository videogameRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
         this.videogameRepository = videogameRepository;
     }
 
@@ -36,5 +43,22 @@ public class VideogameController {
     @DeleteMapping("/videogames/{id}")
     public void deleteVideogame(@PathVariable Long id) {
         videogameRepository.deleteById(id);
+    }
+
+    @PostMapping("/videogames/add")
+    public void addUserVideogame(@RequestBody Map<String, Long> requestBody) {
+
+        System.out.println("entro");
+        Long videogameId = requestBody.get("id");
+
+        User currentUser = userService.getCurrentUser();
+
+        Optional<Videogame> OptVideogame = videogameRepository.findById(videogameId);
+        if (OptVideogame.isPresent()) {
+            Videogame videogame = OptVideogame.get();
+            currentUser.addVideogame(videogame);
+        } else {
+            throw new RuntimeException("El videojuego no existe");
+        }
     }
 }
