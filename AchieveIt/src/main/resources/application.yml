@@ -14,8 +14,15 @@ spring:
             scope:
               - email
               - profile
+  mvc:
+    cors:
+      allowed-origins: "http://localhost:5173"
+      allowed-methods: "GET, POST, PUT, DELETE"
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     show-sql: false
     database-platform: org.hibernate.dialect.OracleDialect

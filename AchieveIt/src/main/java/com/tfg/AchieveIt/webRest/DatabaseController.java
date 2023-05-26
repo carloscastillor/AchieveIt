@@ -39,9 +39,9 @@ public class DatabaseController {
         try {
             FillGenres();
             FillPlatforms();
-            FillDevelopersPublishers();
+            //FillDevelopersPublishers();
             FillVideogames();
-            FillAchievements();
+            //FillAchievements();
         } catch (Exception e) {}
     }
 
