@@ -4,6 +4,7 @@ import com.tfg.AchieveIt.domain.*;
 import com.tfg.AchieveIt.repository.UserRepository;
 import com.tfg.AchieveIt.repository.VideogameRepository;
 import com.tfg.AchieveIt.services.UserService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +28,6 @@ public class VideogameController {
 
     @GetMapping("/videogames")
     public List<Videogame> getAllVideogames() {
-        List<Videogame> videogames = videogameRepository.findAll();
-        for (Videogame videogame : videogames) {
-            System.out.println(videogame.getName());
-        }
-
         return videogameRepository.findAll();
     }
 
@@ -46,17 +42,20 @@ public class VideogameController {
     }
 
     @PostMapping("/videogames/add")
+    @Transactional
     public void addUserVideogame(@RequestBody Map<String, Long> requestBody) {
 
-        System.out.println("entro");
-        Long videogameId = requestBody.get("id");
+        Long videogameId = requestBody.get("videogameId");
 
-        User currentUser = userService.getCurrentUser();
+        //User currentUser = userService.getCurrentUser();
+        Optional<User> currentUser = userRepository.findById(1L);
 
         Optional<Videogame> OptVideogame = videogameRepository.findById(videogameId);
         if (OptVideogame.isPresent()) {
             Videogame videogame = OptVideogame.get();
-            currentUser.addVideogame(videogame);
+            System.out.println(currentUser.get().getVideogames().size());
+            currentUser.get().addVideogame(videogame);
+            System.out.println(currentUser.get().getVideogames().size());
         } else {
             throw new RuntimeException("El videojuego no existe");
         }
