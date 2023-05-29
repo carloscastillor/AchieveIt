@@ -42,11 +42,9 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .and()
                 .oauth2Login()
                 .successHandler(new AuthenticationSuccessHandler() {
-                    private final Logger logger = LoggerFactory.getLogger(getClass());
                     @Override
                     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                                         Authentication authentication) throws IOException, ServletException {
-                        logger.info("entro");
                         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
 
                         userService.processOAuthPostLogin(oauthUser);

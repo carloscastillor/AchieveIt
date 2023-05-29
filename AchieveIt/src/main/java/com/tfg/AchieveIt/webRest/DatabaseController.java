@@ -1,10 +1,14 @@
 package com.tfg.AchieveIt.webRest;
 
 import com.api.igdb.exceptions.RequestException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.tfg.AchieveIt.domain.*;
 import com.tfg.AchieveIt.repository.*;
 import com.tfg.AchieveIt.services.AchievementStatsApiClient;
 import com.tfg.AchieveIt.services.IGDBApiClient;
+import com.tfg.AchieveIt.services.SteamApiClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +26,9 @@ public class DatabaseController {
     private final DeveloperRepository developerRepository;
     private final PublisherRepository publisherRepository;
     private final AchievementRepository achievementRepository;
-    private IGDBApiClient igdbApiClient = new IGDBApiClient();
-    private AchievementStatsApiClient achievementStatsApiClient = new AchievementStatsApiClient();
+    private final IGDBApiClient igdbApiClient = new IGDBApiClient();
+    private final AchievementStatsApiClient achievementStatsApiClient = new AchievementStatsApiClient();
+    private final SteamApiClient steamApiClient = new SteamApiClient();
 
     public DatabaseController(VideogameRepository videogameRepository, GenreRepository genreRepository, PlatformRepository platformRepository, DeveloperRepository developerRepository, PublisherRepository publisherRepository, AchievementRepository achievementRepository) {
         this.videogameRepository = videogameRepository;
@@ -41,7 +46,7 @@ public class DatabaseController {
             FillPlatforms();
             //FillDevelopersPublishers();
             FillVideogames();
-            //FillAchievements();
+            FillAchievements();
         } catch (Exception e) {}
     }
 
@@ -146,11 +151,35 @@ public class DatabaseController {
          }while(!games.isEmpty());
     }
 
-    private void FillAchievements(){
-        String achievement = "";
+    private void FillAchievements() {
+        List<SteamApiClient.VideogameSteam> videogameSteamList = steamApiClient.searchGames();
 
-        achievement = achievementStatsApiClient.searchAchievements("1596730");
+        for (SteamApiClient.VideogameSteam videogameSteam : videogameSteamList) {
+            Videogame videogameBd = videogameRepository.findVideogameByName(videogameSteam.getName());
+            JsonArray achievements = steamApiClient.searchAchievements(videogameSteam.getAppId());
+            //Videogame videogameBd = videogameRepository.findVideogameByName("The Binding of Isaac Rebirth");
+            //JsonArray achievements = steamApiClient.searchAchievements("250900");
 
-        System.out.println(achievement);
+
+            for (JsonElement achievementElement : achievements) {
+                JsonObject achievementSt = achievementElement.getAsJsonObject();
+
+                String name = achievementSt.get("displayName").getAsString();
+                String description = "The achievement has no description";
+                if (achievementSt.has("description")) {
+                    description = achievementSt.get("description").getAsString();
+                }
+                Achievement achievement = new Achievement();
+                achievement.setName(name);
+                achievement.setDescription(description);
+                achievement.setCompleted(false);
+                achievement.setVideogame(videogameBd);
+                achievementRepository.save(achievement);
+
+                videogameBd.getAchievements().add(achievement);
+
+                System.out.println("Game name: " + videogameBd.getName() + "Achievement añadido: " + achievement.getName());
+            }
+        }
     }
 }

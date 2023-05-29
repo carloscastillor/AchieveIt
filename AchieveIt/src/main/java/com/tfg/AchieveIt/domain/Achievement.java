@@ -22,10 +22,9 @@ public class Achievement {
     @Column(name = "completed")
     private Boolean completed;
 
-    public Achievement(String name, String description, Videogame videogame, boolean completed) {
+    public Achievement(String name, String description, boolean completed) {
         this.name = name;
         this.description = description;
-        this.videogame = videogame;
         this.completed = false;
     }
 

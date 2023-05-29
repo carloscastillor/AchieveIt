@@ -45,6 +45,8 @@ public class Videogame {
     )
     Set<Platform> platforms;
 
+    @OneToMany(mappedBy = "videogame", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Achievement> achievements;
     @ManyToMany(mappedBy = "videogames")
     Set<User> users;
 
@@ -102,5 +104,21 @@ public class Videogame {
 
     public void setPlatforms(Set<Platform> platforms) {
         this.platforms = platforms;
+    }
+
+    public Set<Achievement> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(Set<Achievement> achievements) {
+        this.achievements = achievements;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }
