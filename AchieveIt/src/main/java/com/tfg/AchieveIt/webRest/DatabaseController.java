@@ -12,6 +12,7 @@ import com.tfg.AchieveIt.services.SteamApiClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import proto.Company;
 import proto.Game;
 
 import java.util.*;
@@ -42,10 +43,10 @@ public class DatabaseController {
     @GetMapping("/dbFill")
     public void FillDatabase() {
         try {
-            FillGenres();
+            /*FillGenres();
             FillPlatforms();
-            //FillDevelopersPublishers();
-            FillVideogames();
+            FillDevelopersPublishers();
+            FillVideogames();*/
             FillAchievements();
         } catch (Exception e) {}
     }
@@ -53,7 +54,7 @@ public class DatabaseController {
     private void FillGenres() throws RequestException {
 
         int page = 0;
-        List<proto.Genre> genres;
+        Set<proto.Genre> genres;
         do {
             genres = igdbApiClient.searchGenres(page);
             for (proto.Genre genre : genres) {
@@ -67,7 +68,7 @@ public class DatabaseController {
     private void FillPlatforms()throws RequestException {
 
         int page = 0;
-        List<proto.Platform> platforms;
+        Set<proto.Platform> platforms;
         do {
             platforms = igdbApiClient.searchPlatforms(page);
             for (proto.Platform platform : platforms) {
@@ -80,7 +81,7 @@ public class DatabaseController {
 
     private void FillDevelopersPublishers() throws RequestException{
         int page = 0;
-        List<proto.Company> Companies;
+        Set<proto.Company> Companies;
         do {
             Companies = igdbApiClient.searchCompanies(page);
             for (proto.Company company : Companies) {
@@ -101,7 +102,7 @@ public class DatabaseController {
 
     private void FillVideogames() throws RequestException {
          int page = 0;
-         List<Game> games;
+         Set<Game> games;
          do {
              games = igdbApiClient.searchGames(page);
              for (Game game : games) {

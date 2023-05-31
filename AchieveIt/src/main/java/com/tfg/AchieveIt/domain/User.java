@@ -1,4 +1,5 @@
 package com.tfg.AchieveIt.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -23,6 +24,10 @@ public class User {
     String name;
     @Column(name = "email")
     String email;
+
+    @Column(name = "isLoggedIn")
+    boolean isLoggedIn;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     private Provider provider;
@@ -33,13 +38,8 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "videogame_id")
     )
+    @JsonIgnore
     Set<Videogame> videogames;
-
-    public User(String userName, String name, String email) {
-        this.userName = userName;
-        this.name = name;
-        this.email = email;
-    }
 
     public Long getId() {return id;}
 
@@ -82,4 +82,12 @@ public class User {
     }
 
     public void addVideogame(Videogame videogame){this.videogames.add(videogame);}
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
+    }
 }

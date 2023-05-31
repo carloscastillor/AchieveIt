@@ -19,18 +19,20 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void processOAuthPostLogin(CustomOAuth2User user) {
+    public User processOAuthPostLogin(CustomOAuth2User user) {
 
         Optional<User> existingUser = Optional.ofNullable(userRepository.findUserByEmail(user.getEmail()));
         if (existingUser.isPresent()) {
-
+            return null;
         } else {
             User newUser = new User();
             newUser.setEmail(user.getEmail());
             newUser.setProvider(User.Provider.GOOGLE);
             newUser.setName(user.getName());
             newUser.setUserName("userName");
+            newUser.setLoggedIn(true);
             userRepository.save(newUser);
+            return newUser;
         }
     }
 

@@ -1,4 +1,5 @@
 package com.tfg.AchieveIt.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -21,6 +22,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
+    @JsonIgnore
     Set<Genre> genres;
     @ManyToMany(targetEntity = Developer.class)
     @JoinTable(
@@ -28,6 +30,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
+    @JsonIgnore
     Set<Developer> developers;
 
     @ManyToMany(targetEntity = Publisher.class)
@@ -36,6 +39,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "publisher_id")
     )
+    @JsonIgnore
     Set<Publisher> publishers;
     @ManyToMany(targetEntity = Platform.class)
     @JoinTable(
@@ -43,9 +47,11 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "platform_id")
     )
+    @JsonIgnore
     Set<Platform> platforms;
 
     @OneToMany(mappedBy = "videogame", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     Set<Achievement> achievements;
     @ManyToMany(mappedBy = "videogames")
     Set<User> users;

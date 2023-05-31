@@ -1,13 +1,20 @@
 package com.tfg.AchieveIt.webRest.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tfg.AchieveIt.domain.User;
 import com.tfg.AchieveIt.services.UserService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
@@ -15,16 +22,23 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Base64;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration implements WebMvcConfigurer {
+public class SecurityConfiguration {
 
     private final UserService userService;
+    private static final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
+    private static final byte[] secretBytes = secret.getEncoded();
+    private static final String base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
+
 
     public SecurityConfiguration(UserService userService) {
         this.userService = userService;
@@ -33,10 +47,17 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors().disable()
-                .csrf().disable()
+                .cors()
+                .configurationSource(request -> {
+                    CorsConfiguration corsConfig = new CorsConfiguration();
+                    corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+                    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+                    corsConfig.setAllowedHeaders(Arrays.asList("*"));
+                    return corsConfig;
+                })
+                .and()
                 .authorizeRequests()
-                .requestMatchers("/login/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS,"/login/**").permitAll()
                 .anyRequest().permitAll()
                 //.anyRequest().authenticated()
                 .and()
@@ -47,9 +68,15 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                                         Authentication authentication) throws IOException, ServletException {
                         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
 
-                        userService.processOAuthPostLogin(oauthUser);
+                        User user = userService.processOAuthPostLogin(oauthUser);
 
-                        response.sendRedirect("/Home");
+                        String token = Jwts.builder()
+                                .setSubject(user.getId().toString())
+                                .signWith(SignatureAlgorithm.HS256, base64SecretBytes)
+                                .compact();
+
+                        String redirectUrl = "http://localhost:5173/Home?token=" + token;
+                        response.sendRedirect(redirectUrl);
                     }
                 })
                 .failureHandler(new AuthenticationFailureHandler() {
@@ -65,12 +92,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
         return http.build();
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173") // Reemplaza con la URL de tu frontend
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // Ajusta los métodos permitidos según tu aplicación
-                .allowedHeaders("*")
-                .allowCredentials(true);
+    public String getJwtSecret() {
+        return base64SecretBytes;
     }
 }

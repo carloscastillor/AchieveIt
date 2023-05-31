@@ -27,8 +27,12 @@ public class VideogameController {
     }
 
     @GetMapping("/videogames")
-    public List<Videogame> getAllVideogames() {
-        return videogameRepository.findAll();
+    public List<Videogame> getAllVideogames(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize) {
+        int startIndex = page * pageSize;
+        List<Videogame> videogames = videogameRepository.findAll();
+
+        int endIndex = Math.min(startIndex + pageSize, videogames.size());
+        return videogames.subList(startIndex, endIndex);
     }
 
     @GetMapping("/videogames/{id}")
@@ -53,9 +57,7 @@ public class VideogameController {
         Optional<Videogame> OptVideogame = videogameRepository.findById(videogameId);
         if (OptVideogame.isPresent()) {
             Videogame videogame = OptVideogame.get();
-            System.out.println(currentUser.get().getVideogames().size());
             currentUser.get().addVideogame(videogame);
-            System.out.println(currentUser.get().getVideogames().size());
         } else {
             throw new RuntimeException("El videojuego no existe");
         }
