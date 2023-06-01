@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173")
 public class VideogameController {
 
     private final UserService userService;
@@ -51,7 +50,8 @@ public class VideogameController {
 
         Long videogameId = requestBody.get("videogameId");
 
-        //User currentUser = userService.getCurrentUser();
+        System.out.println("  aaaaaaaaaaaaa" + videogameId);
+
         Optional<User> currentUser = userRepository.findById(1L);
 
         Optional<Videogame> OptVideogame = videogameRepository.findById(videogameId);

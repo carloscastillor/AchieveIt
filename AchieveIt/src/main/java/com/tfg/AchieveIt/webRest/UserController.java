@@ -3,6 +3,7 @@ package com.tfg.AchieveIt.webRest;
 import com.tfg.AchieveIt.domain.User;
 import com.tfg.AchieveIt.domain.Videogame;
 import com.tfg.AchieveIt.repository.UserRepository;
+import com.tfg.AchieveIt.services.UserService;
 import com.tfg.AchieveIt.webRest.security.SecurityConfiguration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,11 +18,11 @@ import java.util.Optional;
 public class UserController {
 
     private final UserRepository userRepository;
-    private final SecurityConfiguration securityConfiguration;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository, SecurityConfiguration securityConfiguration) {
+    public UserController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
-        this.securityConfiguration = securityConfiguration;
+        this.userService = userService;
     }
 
     @GetMapping("/users")
@@ -32,11 +33,9 @@ public class UserController {
 
     @GetMapping("/users/{token}")
     public User getUser(@PathVariable("token") String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(securityConfiguration.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
         String userId = claims.getSubject();
         Long id = Long.parseLong(userId);
-
-        System.out.println(id);
 
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException());
     }
@@ -46,14 +45,18 @@ public class UserController {
         userRepository.deleteById(id);
     }
 
-    @GetMapping("/users/{userId}/videogames")
-    public List<Videogame> getUserVideogames(@PathVariable("userId") Long userId) {
+    @GetMapping("/users/{token}/videogames")
+    public List<Videogame> getUserVideogames(@PathVariable("token") String token) {
 
-        Optional<User> userOpt = userRepository.findById(userId);
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long id = Long.parseLong(userId);
+
+        Optional<User> userOpt = userRepository.findById(id);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            return new ArrayList<Videogame>(user.getVideogames());
+            return new ArrayList<>(user.getVideogames());
         } else {
             throw new RuntimeException("El usuario no existe");
         }

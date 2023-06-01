@@ -3,15 +3,24 @@ package com.tfg.AchieveIt.services;
 import com.tfg.AchieveIt.domain.User;
 import com.tfg.AchieveIt.repository.UserRepository;
 import com.tfg.AchieveIt.webRest.security.CustomOAuth2User;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
 public class UserService {
+
+    private static final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
+    private static final byte[] secretBytes = secret.getEncoded();
+    private static final String base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
 
     private final UserRepository userRepository;
 
@@ -23,8 +32,19 @@ public class UserService {
 
         Optional<User> existingUser = Optional.ofNullable(userRepository.findUserByEmail(user.getEmail()));
         if (existingUser.isPresent()) {
-            return null;
+            User oldUser =  existingUser.get();
+            oldUser.setLoggedIn(true);
+            userRepository.save(oldUser);
+            String token = Jwts.builder()
+                    .setSubject(oldUser.getId().toString())
+                    .signWith(SignatureAlgorithm.HS256, base64SecretBytes)
+                    .compact();
+
+            oldUser.setToken(token);
+
+            return oldUser;
         } else {
+
             User newUser = new User();
             newUser.setEmail(user.getEmail());
             newUser.setProvider(User.Provider.GOOGLE);
@@ -32,7 +52,22 @@ public class UserService {
             newUser.setUserName("userName");
             newUser.setLoggedIn(true);
             userRepository.save(newUser);
+            String token = Jwts.builder()
+                    .setSubject(newUser.getId().toString())
+                    .signWith(SignatureAlgorithm.HS256, base64SecretBytes)
+                    .compact();
+
+            newUser.setToken(token);
             return newUser;
+        }
+    }
+
+    public void processOAuthPostLogout(CustomOAuth2User user) {
+        User existingUser = userRepository.findUserByEmail(user.getEmail());
+        if (existingUser != null) {
+            existingUser.setLoggedIn(false);
+            existingUser.setToken(null);
+            userRepository.save(existingUser);
         }
     }
 
@@ -45,5 +80,9 @@ public class UserService {
 
         User user = userRepository.findUserByEmail(email);
         return user;
+    }
+
+    public String getJwtSecret() {
+        return base64SecretBytes;
     }
 }

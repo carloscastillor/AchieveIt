@@ -1,17 +1,13 @@
 package com.tfg.AchieveIt.webRest.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tfg.AchieveIt.domain.User;
 import com.tfg.AchieveIt.services.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.impl.crypto.MacProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,9 +18,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Arrays;
@@ -35,10 +32,6 @@ import java.util.Base64;
 public class SecurityConfiguration {
 
     private final UserService userService;
-    private static final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
-    private static final byte[] secretBytes = secret.getEncoded();
-    private static final String base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
-
 
     public SecurityConfiguration(UserService userService) {
         this.userService = userService;
@@ -53,6 +46,7 @@ public class SecurityConfiguration {
                     corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
                     corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
                     corsConfig.setAllowedHeaders(Arrays.asList("*"));
+
                     return corsConfig;
                 })
                 .and()
@@ -70,12 +64,7 @@ public class SecurityConfiguration {
 
                         User user = userService.processOAuthPostLogin(oauthUser);
 
-                        String token = Jwts.builder()
-                                .setSubject(user.getId().toString())
-                                .signWith(SignatureAlgorithm.HS256, base64SecretBytes)
-                                .compact();
-
-                        String redirectUrl = "http://localhost:5173/Home?token=" + token;
+                        String redirectUrl = "http://localhost:5173/Home?token=" + user.getToken();
                         response.sendRedirect(redirectUrl);
                     }
                 })
@@ -87,12 +76,19 @@ public class SecurityConfiguration {
                     }
                 })
                 .and()
-                .oauth2Client();
+                .logout()
+                .logoutSuccessHandler(new LogoutSuccessHandler() {
+                    @Override
+                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                        CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+                        userService.processOAuthPostLogout(oauthUser);
+
+                        String redirectUrl = "http://localhost:5173/Home";
+                        response.sendRedirect(redirectUrl);
+                    }
+                })
+                .invalidateHttpSession(true);
 
         return http.build();
-    }
-
-    public String getJwtSecret() {
-        return base64SecretBytes;
     }
 }

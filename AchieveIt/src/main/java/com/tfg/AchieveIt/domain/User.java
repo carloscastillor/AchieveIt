@@ -41,6 +41,8 @@ public class User {
     @JsonIgnore
     Set<Videogame> videogames;
 
+    private String token;
+
     public Long getId() {return id;}
 
     public void setId(Long id) {this.id = id;}
@@ -90,4 +92,13 @@ public class User {
     public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
     }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
 }

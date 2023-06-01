@@ -3,6 +3,8 @@ package com.tfg.AchieveIt.webRest.security;
 import java.util.Collection;
 import java.util.Map;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
