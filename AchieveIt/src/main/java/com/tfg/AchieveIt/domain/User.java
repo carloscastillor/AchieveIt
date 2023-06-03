@@ -1,5 +1,6 @@
 package com.tfg.AchieveIt.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -47,6 +48,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "achievement_id")
     )
+    @JsonIgnore
     private Set<Achievement> achievements;
 
     private String token;
@@ -114,7 +116,11 @@ public class User {
         return achievements;
     }
 
-    public void setAchievements(Set<Achievement> achievements) {
-        this.achievements = achievements;
+    public void addAchievement(Achievement achievement) {
+        this.achievements.add(achievement);
+    }
+
+    public void removeAchievement(Achievement achievement){
+        this.achievements.remove(achievement);
     }
 }
