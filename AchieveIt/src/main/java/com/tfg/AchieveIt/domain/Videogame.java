@@ -1,5 +1,6 @@
 package com.tfg.AchieveIt.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -51,7 +52,7 @@ public class Videogame {
     Set<Platform> platforms;
 
     @OneToMany(mappedBy = "videogame", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonManagedReference
     Set<Achievement> achievements;
     @ManyToMany(mappedBy = "videogames")
     Set<User> users;

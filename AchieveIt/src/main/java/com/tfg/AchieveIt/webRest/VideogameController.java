@@ -49,6 +49,15 @@ public class VideogameController {
         int endIndex = Math.min(startIndex + pageSize, videogames.size());
         return videogames.subList(startIndex, endIndex);
     }
+    @GetMapping("/videogames/name")
+    public List<Videogame> getVideogamesByName(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "") String name) {
+
+        int startIndex = page * pageSize;
+        List<Videogame> videogames = videogameRepository.findVideogameByNameContaining(name);;
+
+        int endIndex = Math.min(startIndex + pageSize, videogames.size());
+        return videogames.subList(startIndex, endIndex);
+    }
 
     @GetMapping("/videogames/{id}")
     public Videogame getVideogame(@PathVariable Long id) {

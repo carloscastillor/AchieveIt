@@ -1,4 +1,5 @@
 package com.tfg.AchieveIt.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -19,6 +20,7 @@ public class Achievement {
 
     @ManyToOne(targetEntity = Videogame.class)
     @JoinColumn(name = "videogame_id")
+    @JsonBackReference
     private Videogame videogame;
 
     @ManyToMany(mappedBy = "achievements")
