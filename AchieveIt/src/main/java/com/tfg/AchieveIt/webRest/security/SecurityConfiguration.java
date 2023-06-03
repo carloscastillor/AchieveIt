@@ -50,6 +50,7 @@ public class SecurityConfiguration {
                     return corsConfig;
                 })
                 .and()
+                .csrf().disable()
                 .authorizeRequests()
                 .requestMatchers(HttpMethod.OPTIONS,"/login/**").permitAll()
                 .anyRequest().permitAll()

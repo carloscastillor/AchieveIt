@@ -41,6 +41,14 @@ public class User {
     @JsonIgnore
     Set<Videogame> videogames;
 
+    @ManyToMany(targetEntity = Achievement.class)
+    @JoinTable(
+            name = "user_achievement",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "achievement_id")
+    )
+    private Set<Achievement> achievements;
+
     private String token;
 
     public Long getId() {return id;}
@@ -84,6 +92,7 @@ public class User {
     }
 
     public void addVideogame(Videogame videogame){this.videogames.add(videogame);}
+    public void removeVideogame(Videogame videogame){this.videogames.remove(videogame);}
 
     public boolean isLoggedIn() {
         return isLoggedIn;
@@ -101,4 +110,11 @@ public class User {
         this.token = token;
     }
 
+    public Set<Achievement> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(Set<Achievement> achievements) {
+        this.achievements = achievements;
+    }
 }

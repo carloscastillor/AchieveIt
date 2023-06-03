@@ -22,7 +22,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    @JsonIgnore
+    //@JsonIgnore
     Set<Genre> genres;
     @ManyToMany(targetEntity = Developer.class)
     @JoinTable(
@@ -30,7 +30,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
-    @JsonIgnore
+    //@JsonIgnore
     Set<Developer> developers;
 
     @ManyToMany(targetEntity = Publisher.class)
@@ -39,7 +39,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "publisher_id")
     )
-    @JsonIgnore
+    //@JsonIgnore
     Set<Publisher> publishers;
     @ManyToMany(targetEntity = Platform.class)
     @JoinTable(
@@ -47,7 +47,7 @@ public class Videogame {
             joinColumns = @JoinColumn(name = "videogame_id"),
             inverseJoinColumns = @JoinColumn(name = "platform_id")
     )
-    @JsonIgnore
+    //@JsonIgnore
     Set<Platform> platforms;
 
     @OneToMany(mappedBy = "videogame", cascade = CascadeType.ALL, orphanRemoval = true)

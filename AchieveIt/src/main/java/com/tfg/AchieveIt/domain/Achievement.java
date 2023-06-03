@@ -1,6 +1,8 @@
 package com.tfg.AchieveIt.domain;
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "achievement_table")
 public class Achievement {
@@ -19,13 +21,12 @@ public class Achievement {
     @JoinColumn(name = "videogame_id")
     private Videogame videogame;
 
-    @Column(name = "completed")
-    private Boolean completed;
+    @ManyToMany(mappedBy = "achievements")
+    private Set<User> users;
 
-    public Achievement(String name, String description, boolean completed) {
+    public Achievement(String name, String description) {
         this.name = name;
         this.description = description;
-        this.completed = false;
     }
 
     public Achievement() {
@@ -64,11 +65,11 @@ public class Achievement {
         this.videogame = videogame;
     }
 
-    public boolean isCompleted() {
-        return completed;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

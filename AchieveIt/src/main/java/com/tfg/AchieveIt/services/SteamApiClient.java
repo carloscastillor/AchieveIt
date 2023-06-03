@@ -93,7 +93,7 @@ public class SteamApiClient {
 
                     HttpResponse<String> appDetailsResponse = httpClient.send(appDetailsRequest, HttpResponse.BodyHandlers.ofString());
                     String appDetailsResponseBody = appDetailsResponse.body();
-                    System.out.println(appDetailsResponseBody);
+                    //System.out.println(appDetailsResponseBody);
                     JsonObject appDetailsJson = JsonParser.parseString(appDetailsResponseBody).getAsJsonObject().getAsJsonObject(appId);
                     //System.out.println(appDetailsJson);
 
@@ -103,6 +103,7 @@ public class SteamApiClient {
                         if (appData.has("type") && appData.get("type").getAsString().equalsIgnoreCase("game")) {
                             VideogameSteam videogameSteam = new VideogameSteam(appId, appName);
                             videogameSteamSet.add(videogameSteam);
+                            System.out.println(appName);
                         }
                     } else {
                         System.out.println("No se encontraron datos para la aplicación: " + appId);

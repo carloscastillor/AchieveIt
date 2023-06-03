@@ -153,34 +153,34 @@ public class DatabaseController {
     }
 
     private void FillAchievements() {
-        List<SteamApiClient.VideogameSteam> videogameSteamList = steamApiClient.searchGames();
+        //List<SteamApiClient.VideogameSteam> videogameSteamList = steamApiClient.searchGames();
 
-        for (SteamApiClient.VideogameSteam videogameSteam : videogameSteamList) {
-            Videogame videogameBd = videogameRepository.findVideogameByName(videogameSteam.getName());
-            JsonArray achievements = steamApiClient.searchAchievements(videogameSteam.getAppId());
-            //Videogame videogameBd = videogameRepository.findVideogameByName("The Binding of Isaac Rebirth");
-            //JsonArray achievements = steamApiClient.searchAchievements("250900");
-
+        //for (SteamApiClient.VideogameSteam videogameSteam : videogameSteamList) {
+            //Videogame videogameBd = videogameRepository.findVideogameByName(videogameSteam.getName());
+            //JsonArray achievements = steamApiClient.searchAchievements(videogameSteam.getAppId());
+            Videogame videogameBd = videogameRepository.findVideogameByName("The Binding of Isaac: Rebirth");
+            JsonArray achievements = steamApiClient.searchAchievements("250900");
 
             for (JsonElement achievementElement : achievements) {
                 JsonObject achievementSt = achievementElement.getAsJsonObject();
+
 
                 String name = achievementSt.get("displayName").getAsString();
                 String description = "The achievement has no description";
                 if (achievementSt.has("description")) {
                     description = achievementSt.get("description").getAsString();
                 }
+
                 Achievement achievement = new Achievement();
                 achievement.setName(name);
                 achievement.setDescription(description);
-                achievement.setCompleted(false);
                 achievement.setVideogame(videogameBd);
                 achievementRepository.save(achievement);
 
                 videogameBd.getAchievements().add(achievement);
 
-                System.out.println("Game name: " + videogameBd.getName() + "Achievement añadido: " + achievement.getName());
+                System.out.println("Game name: " + videogameBd.getName() + " Achievement añadido: " + achievement.getName());
             }
-        }
+        //}
     }
 }
