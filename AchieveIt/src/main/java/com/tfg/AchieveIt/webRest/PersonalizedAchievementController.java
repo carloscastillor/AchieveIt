@@ -1,6 +1,9 @@
 package com.tfg.AchieveIt.webRest;
 
+import com.tfg.AchieveIt.domain.Achievement;
 import com.tfg.AchieveIt.domain.PersonalizedAchievement;
+import com.tfg.AchieveIt.domain.User;
+import com.tfg.AchieveIt.domain.Videogame;
 import com.tfg.AchieveIt.repository.PersonalizedAchievementRepository;
 import com.tfg.AchieveIt.repository.UserRepository;
 import com.tfg.AchieveIt.repository.VideogameRepository;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -49,6 +54,65 @@ public class PersonalizedAchievementController {
         personalizedAchievementRepository.deleteById(id);
     }
 
+    @GetMapping("/personalized-achievements/videogame/{id}")
+    public List<PersonalizedAchievement> getPersonalizedAchievementByVideogame(@PathVariable("id") Long id) {
+        return personalizedAchievementRepository.findPersonalizedAchievementByVideogameId(id);
+    }
+
+    @GetMapping("/personalized-achievements/videogame/{id}/user/{token}")
+    public Set<Long> getUserPersonalizedAchievementsForGame(@PathVariable("id") String id, @PathVariable("token") String token) {
+
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long uId = Long.parseLong(userId);
+
+        Long videogameId = Long.parseLong(id);
+
+        Optional<Videogame> OptVideogame = videogameRepository.findById(videogameId);
+        if (OptVideogame.isPresent()) {
+            return userRepository.findUserPersonalizedAchievementsForGame(uId, videogameId);
+        } else {
+            throw new RuntimeException("El videojuego no existe");
+        }
+    }
+
+    @PostMapping("/personalized-achievements/add/{token}")
+    @Transactional
+    public void AddPersonalizedAchievement(@RequestBody Map<String, Long> requestBody, @PathVariable("token") String token){
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long id = Long.parseLong(userId);
+        Optional<User> currentUser = userRepository.findById(id);
+
+        Long personalizedAchievementId = requestBody.get("personalizedAchievementId");
+
+        Optional<PersonalizedAchievement> OptPersonalizedAchievement = personalizedAchievementRepository.findById(personalizedAchievementId);
+        if (OptPersonalizedAchievement.isPresent()) {
+            PersonalizedAchievement personalizedAchievement = OptPersonalizedAchievement.get();
+            currentUser.get().addPersonalizedAchievement(personalizedAchievement);
+        } else {
+            throw new RuntimeException("El logro no existe");
+        }
+    }
+
+    @PostMapping("/personalized-achievements/remove/{token}")
+    @Transactional
+    public void RemovePersonalizedAchievement(@RequestBody Map<String, Long> requestBody, @PathVariable("token") String token){
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long id = Long.parseLong(userId);
+        Optional<User> currentUser = userRepository.findById(id);
+
+        Long personalizedAchievementId = requestBody.get("personalizedAchievementId");
+
+        Optional<PersonalizedAchievement> OptPersonalizedAchievement = personalizedAchievementRepository.findById(personalizedAchievementId);
+        if (OptPersonalizedAchievement.isPresent()) {
+            PersonalizedAchievement personalizedAchievement = OptPersonalizedAchievement.get();
+            currentUser.get().removePersonalizedAchievement(personalizedAchievement);
+        } else {
+            throw new RuntimeException("El logro no existe");
+        }
+    }
     @PostMapping("/personalized-achievements/create/{token}")
     @Transactional
     public void CreatePersonalizedAchievement(@RequestBody Map<String, String> requestBody, @PathVariable("token") String token){

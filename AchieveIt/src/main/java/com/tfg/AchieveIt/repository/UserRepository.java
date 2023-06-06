@@ -14,4 +14,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT a.id FROM User u JOIN u.achievements a JOIN u.videogames v WHERE u.id = :userId AND v.id = :videogameId")
     Set<Long> findUserAchievementsForGame(@Param("userId") Long userId, @Param("videogameId") Long videogameId);
+
+    @Query("SELECT pa.id FROM User u JOIN u.personalizedAchievements pa JOIN u.videogames v WHERE u.id = :userId AND v.id = :videogameId")
+    Set<Long> findUserPersonalizedAchievementsForGame(@Param("userId") Long userId, @Param("videogameId") Long videogameId);
+
+
 }

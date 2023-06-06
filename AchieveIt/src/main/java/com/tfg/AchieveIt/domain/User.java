@@ -51,9 +51,17 @@ public class User {
     @JsonIgnore
     private Set<Achievement> achievements;
 
+    @ManyToMany(targetEntity = PersonalizedAchievement.class)
+    @JoinTable(
+            name = "user_personalized_achievement",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "personalizedAchievement_id")
+    )
+    //@JsonIgnore
+    private Set<PersonalizedAchievement> personalizedAchievements;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    Set<PersonalizedAchievement> personalizedAchievements;
+    Set<PersonalizedAchievement> createdPersonalizedAchievements;
 
     private String token;
 
@@ -127,6 +135,14 @@ public class User {
     public void removeAchievement(Achievement achievement){
         this.achievements.remove(achievement);
     }
+    public void addCreatedPersonalizedAchievement(PersonalizedAchievement achievement) {
+        this.createdPersonalizedAchievements.add(achievement);
+    }
+
+    public void removeCreatedPersonalizedAchievement(PersonalizedAchievement achievement){
+        this.createdPersonalizedAchievements.remove(achievement);
+    }
+
     public void addPersonalizedAchievement(PersonalizedAchievement achievement) {
         this.personalizedAchievements.add(achievement);
     }

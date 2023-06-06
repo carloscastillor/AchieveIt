@@ -34,7 +34,7 @@ public class PersonalizedAchievementService {
         personalizedAchievement.setVideogame(videogame);
         personalizedAchievement.setUser(user);
 
-        user.addPersonalizedAchievement(personalizedAchievement);
+        user.addCreatedPersonalizedAchievement(personalizedAchievement);
         videogame.addPersonalizedAchievement(personalizedAchievement);
 
         personalizedAchievementRepository.save(personalizedAchievement);
