@@ -51,6 +51,10 @@ public class User {
     @JsonIgnore
     private Set<Achievement> achievements;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    Set<PersonalizedAchievement> personalizedAchievements;
+
     private String token;
 
     public Long getId() {return id;}
@@ -122,5 +126,12 @@ public class User {
 
     public void removeAchievement(Achievement achievement){
         this.achievements.remove(achievement);
+    }
+    public void addPersonalizedAchievement(PersonalizedAchievement achievement) {
+        this.personalizedAchievements.add(achievement);
+    }
+
+    public void removePersonalizedAchievement(PersonalizedAchievement achievement){
+        this.personalizedAchievements.remove(achievement);
     }
 }

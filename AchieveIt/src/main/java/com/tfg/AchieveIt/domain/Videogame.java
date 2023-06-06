@@ -1,6 +1,7 @@
 package com.tfg.AchieveIt.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.tfg.AchieveIt.services.PersonalizedAchievementService;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -54,6 +55,9 @@ public class Videogame {
     @OneToMany(mappedBy = "videogame", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     Set<Achievement> achievements;
+    @OneToMany(mappedBy = "videogame", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    Set<PersonalizedAchievement> personalizedAchievements;
     @ManyToMany(mappedBy = "videogames")
     Set<User> users;
 
@@ -127,5 +131,13 @@ public class Videogame {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    public void addPersonalizedAchievement(PersonalizedAchievement personalizedAchievement){
+        this.personalizedAchievements.add(personalizedAchievement);
+    }
+
+    public void removePersonalizedAchievement(PersonalizedAchievement personalizedAchievement){
+        this.personalizedAchievements.remove(personalizedAchievement);
     }
 }
