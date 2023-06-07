@@ -29,21 +29,25 @@ public class PersonalizedAchievement{
     private User user;
 
     @Column(name = "likes")
-    private int likes;
+    private int likesNum;
 
     @ManyToMany(mappedBy = "personalizedAchievements")
     private Set<User> users;
 
+    @OneToMany(mappedBy = "personalizedAchievement")
+    private Set<Like> likes;
+
     public PersonalizedAchievement() {
     }
 
-    public int getLikes() {
-        return likes;
+    public int getLikesNum() {
+        return likesNum;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
+    public void setLikesNum(int likes) {
+        this.likesNum = likes;
     }
+
 
     public String getName() {
         return name;
@@ -83,5 +87,13 @@ public class PersonalizedAchievement{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void addLike(Like like){
+        this.likes.add(like);
+    }
+
+    public void removeLike(Like like){
+        this.likes.remove(like);
     }
 }

@@ -63,6 +63,9 @@ public class User {
     @JsonManagedReference
     Set<PersonalizedAchievement> createdPersonalizedAchievements;
 
+    @OneToMany(mappedBy = "user")
+    private Set<Like> likes;
+
     private String token;
 
     public Long getId() {return id;}
@@ -149,5 +152,13 @@ public class User {
 
     public void removePersonalizedAchievement(PersonalizedAchievement achievement){
         this.personalizedAchievements.remove(achievement);
+    }
+
+    public void addLike(Like like){
+        this.likes.add(like);
+    }
+
+    public void removeLike(Like like){
+        this.likes.remove(like);
     }
 }
