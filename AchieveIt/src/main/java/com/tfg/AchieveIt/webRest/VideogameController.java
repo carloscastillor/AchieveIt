@@ -4,6 +4,7 @@ import com.tfg.AchieveIt.domain.*;
 import com.tfg.AchieveIt.repository.GenreRepository;
 import com.tfg.AchieveIt.repository.UserRepository;
 import com.tfg.AchieveIt.repository.VideogameRepository;
+import com.tfg.AchieveIt.services.IGDBApiClient;
 import com.tfg.AchieveIt.services.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,6 +23,8 @@ public class VideogameController {
     private final VideogameRepository videogameRepository;
     private final GenreRepository genreRepository;
 
+    private final IGDBApiClient igdbApiClient = new IGDBApiClient();
+
 
     public VideogameController(UserService userService, UserRepository userRepository, VideogameRepository videogameRepository, GenreRepository genreRepository) {
         this.userService = userService;
@@ -31,7 +34,7 @@ public class VideogameController {
     }
 
     @GetMapping("/videogames")
-    public List<Videogame> getAllVideogames(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize) {
+    public List<Videogame> getAllVideogames(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int pageSize) {
         int startIndex = page * pageSize;
         List<Videogame> videogames = videogameRepository.findAll();
 
@@ -40,7 +43,7 @@ public class VideogameController {
     }
 
     @GetMapping("/videogames/genres")
-    public List<Videogame> getVideogamesByGenre(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "") String genre) {
+    public List<Videogame> getVideogamesByGenre(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int pageSize, @RequestParam(defaultValue = "") String genre) {
 
         int startIndex = page * pageSize;
         Optional<Genre> genreDb = genreRepository.findById(Long.parseLong(genre));
@@ -50,7 +53,7 @@ public class VideogameController {
         return videogames.subList(startIndex, endIndex);
     }
     @GetMapping("/videogames/name")
-    public List<Videogame> getVideogamesByName(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "") String name) {
+    public List<Videogame> getVideogamesByName(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int pageSize, @RequestParam(defaultValue = "") String name) {
 
         int startIndex = page * pageSize;
         List<Videogame> videogames = videogameRepository.findVideogameByNameContaining(name);;
@@ -131,6 +134,17 @@ public class VideogameController {
             return false;
         }else{
             throw new RuntimeException("El videojuego no existe");
+        }
+    }
+
+    @GetMapping("/videogames/{videogameName}/cover")
+    public String getVideogameCoverUrl(@PathVariable("videogameName") String videogameName) {
+        try {
+            String coverUrl = igdbApiClient.getCoverUrl(videogameName);
+            return coverUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

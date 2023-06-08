@@ -87,7 +87,7 @@ public class UserService {
         List<Long> recentVideogames = user.getRecentVideogames();
         recentVideogames.add(0,id);
 
-        if(recentVideogames.size()>5){
+        if(recentVideogames.size()>6){
             recentVideogames.remove(recentVideogames.size()-1);
         }
 

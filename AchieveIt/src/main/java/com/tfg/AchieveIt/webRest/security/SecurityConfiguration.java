@@ -65,7 +65,7 @@ public class SecurityConfiguration {
 
                         User user = userService.processOAuthPostLogin(oauthUser);
 
-                        String redirectUrl = "http://localhost:5173/Home?token=" + user.getToken();
+                        String redirectUrl = "http://localhost:5173/?token=" + user.getToken();
                         response.sendRedirect(redirectUrl);
                     }
                 })

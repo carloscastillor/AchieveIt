@@ -7,6 +7,8 @@ import com.api.igdb.request.IGDBWrapper;
 import com.api.igdb.request.ProtoRequestKt;
 import com.api.igdb.request.TwitchAuthenticator;
 import com.api.igdb.utils.TwitchToken;
+import org.springframework.stereotype.Service;
+import proto.Cover;
 import proto.Game;
 import proto.Genre;
 
@@ -58,5 +60,20 @@ public class IGDBApiClient {
         List<proto.Company> companiesList = ProtoRequestKt.companies(this.igdbWrapper, new APICalypse().fields("*").limit(limit).offset(offset).sort("name", Sort.ASCENDING));
         Set<proto.Company> companies = new HashSet<>(companiesList);
         return companies;
+    }
+
+    public String getCoverUrl(String videogameName) throws RequestException {
+        List<proto.Game> games = ProtoRequestKt.games(this.igdbWrapper, new APICalypse().fields("cover.*").limit(limit).search(videogameName));
+
+        Cover cover = games.get(0).getCover();
+
+        if (cover != null) {
+            // Obtiene la URL de la carátula
+            String coverUrl = cover.getUrl();
+            return coverUrl;
+        } else {
+            // Si no se encontró la carátula, retorna null o una URL predeterminada
+            return null;
+        }
     }
 }
