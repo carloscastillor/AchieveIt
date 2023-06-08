@@ -1,10 +1,12 @@
 package com.tfg.AchieveIt.webRest;
 
+import com.tfg.AchieveIt.domain.Achievement;
 import com.tfg.AchieveIt.domain.User;
 import com.tfg.AchieveIt.domain.Videogame;
+import com.tfg.AchieveIt.repository.AchievementRepository;
 import com.tfg.AchieveIt.repository.UserRepository;
+import com.tfg.AchieveIt.repository.VideogameRepository;
 import com.tfg.AchieveIt.services.UserService;
-import com.tfg.AchieveIt.webRest.security.SecurityConfiguration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +21,14 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final AchievementRepository achievementRepository;
+    private final VideogameRepository videogameRepository;
 
-    public UserController(UserRepository userRepository, UserService userService) {
+    public UserController(UserRepository userRepository, UserService userService, AchievementRepository achievementRepository, VideogameRepository videogameRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.achievementRepository = achievementRepository;
+        this.videogameRepository = videogameRepository;
     }
 
     @GetMapping("/users")
@@ -60,5 +66,43 @@ public class UserController {
         } else {
             throw new RuntimeException("El usuario no existe");
         }
+    }
+
+    @GetMapping("/users/{token}/recent-videogames")
+    public List<Videogame> getRecentVideogames(@PathVariable("token") String token){
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long id = Long.parseLong(userId);
+
+        Optional<User> userOpt = userRepository.findById(id);
+
+        List<Long> recentVideogamesIds = userOpt.get().getRecentVideogames();
+
+        List<Videogame> recentVideogames = new ArrayList<>();
+
+        for (Long idV : recentVideogamesIds) {
+            recentVideogames.add(videogameRepository.findById(idV).get());
+        }
+
+        return recentVideogames;
+    }
+
+    @GetMapping("/users/{token}/recent-achievements")
+    public List<Achievement> getRecentAchievements(@PathVariable("token") String token){
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long id = Long.parseLong(userId);
+
+        Optional<User> userOpt = userRepository.findById(id);
+
+        List<Long> recentAchievementsIds = userOpt.get().getRecentAchievements();
+
+        List<Achievement> recentAchievements = new ArrayList<>();
+
+        for (Long idA : recentAchievementsIds) {
+            recentAchievements.add(achievementRepository.findById(idA).get());
+        }
+
+        return recentAchievements;
     }
 }

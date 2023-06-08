@@ -16,5 +16,4 @@ public interface VideogameRepository extends JpaRepository<Videogame, Long> {
 
     @Query("SELECT v FROM Videogame v WHERE REGEXP_REPLACE(LOWER(v.name), '[^a-z0-9 ]', '') LIKE LOWER(concat('%', REGEXP_REPLACE(:name, '[^a-z0-9 ]', ''), '%'))")
     List<Videogame> findVideogameByNameContaining(@Param("name") String name);
-
 }

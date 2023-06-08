@@ -85,6 +85,7 @@ public class VideogameController {
         if (OptVideogame.isPresent()) {
             Videogame videogame = OptVideogame.get();
             currentUser.get().addVideogame(videogame);
+            userService.addRecentVideogame(currentUser.get(), videogameId);
         } else {
             throw new RuntimeException("El videojuego no existe");
         }

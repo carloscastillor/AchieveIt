@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -66,6 +67,15 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Like> likes;
 
+    @ElementCollection
+    @CollectionTable(name = "user_recent_videogames", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "videogame_id")
+    private List<Long> recentVideogames;
+
+    @ElementCollection
+    @CollectionTable(name = "user_recent_achievements", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "achievement_id")
+    private List<Long> recentAchievements;
     private String token;
 
     public Long getId() {return id;}
@@ -160,5 +170,21 @@ public class User {
 
     public void removeLike(Like like){
         this.likes.remove(like);
+    }
+
+    public List<Long> getRecentVideogames() {
+        return recentVideogames;
+    }
+
+    public void setRecentVideogames(List<Long> recentVideogames) {
+        this.recentVideogames = recentVideogames;
+    }
+
+    public List<Long> getRecentAchievements() {
+        return recentAchievements;
+    }
+
+    public void setRecentAchievements(List<Long> recentAchievements) {
+        this.recentAchievements = recentAchievements;
     }
 }

@@ -83,6 +83,7 @@ public class AchievementController {
         if (OptAchievement.isPresent()) {
             Achievement achievement = OptAchievement.get();
             currentUser.get().addAchievement(achievement);
+            userService.addRecentAchievement(currentUser.get(), achievementId);
         } else {
             throw new RuntimeException("El logro no existe");
         }

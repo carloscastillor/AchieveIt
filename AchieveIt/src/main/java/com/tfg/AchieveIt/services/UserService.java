@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -80,6 +81,31 @@ public class UserService {
 
         User user = userRepository.findUserByEmail(email);
         return user;
+    }
+
+    public void addRecentVideogame(User user, Long id){
+        List<Long> recentVideogames = user.getRecentVideogames();
+        recentVideogames.add(0,id);
+
+        if(recentVideogames.size()>5){
+            recentVideogames.remove(recentVideogames.size()-1);
+        }
+
+        user.setRecentVideogames(recentVideogames);
+        userRepository.save(user);
+    }
+
+    public void addRecentAchievement(User user, Long id){
+
+        List<Long> recentAchievements = user.getRecentAchievements();
+        recentAchievements.add(0, id);
+
+        if(recentAchievements.size()>5){
+            recentAchievements.remove(recentAchievements.size()-1);
+        }
+
+        user.setRecentAchievements(recentAchievements);
+        userRepository.save(user);
     }
 
     public String getJwtSecret() {
