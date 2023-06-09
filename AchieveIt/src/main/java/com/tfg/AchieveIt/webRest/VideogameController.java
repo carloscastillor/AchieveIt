@@ -34,7 +34,7 @@ public class VideogameController {
     }
 
     @GetMapping("/videogames")
-    public List<Videogame> getAllVideogames(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int pageSize) {
+    public List<Videogame> getAllVideogames(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int pageSize) {
         int startIndex = page * pageSize;
         List<Videogame> videogames = videogameRepository.findAll();
 
@@ -43,7 +43,7 @@ public class VideogameController {
     }
 
     @GetMapping("/videogames/genres")
-    public List<Videogame> getVideogamesByGenre(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int pageSize, @RequestParam(defaultValue = "") String genre) {
+    public List<Videogame> getVideogamesByGenre(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int pageSize, @RequestParam(defaultValue = "") String genre) {
 
         int startIndex = page * pageSize;
         Optional<Genre> genreDb = genreRepository.findById(Long.parseLong(genre));
@@ -53,7 +53,7 @@ public class VideogameController {
         return videogames.subList(startIndex, endIndex);
     }
     @GetMapping("/videogames/name")
-    public List<Videogame> getVideogamesByName(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int pageSize, @RequestParam(defaultValue = "") String name) {
+    public List<Videogame> getVideogamesByName(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int pageSize, @RequestParam(defaultValue = "") String name) {
 
         int startIndex = page * pageSize;
         List<Videogame> videogames = videogameRepository.findVideogameByNameContaining(name);;

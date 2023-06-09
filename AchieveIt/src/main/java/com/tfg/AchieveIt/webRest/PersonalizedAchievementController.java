@@ -14,10 +14,7 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -183,6 +180,27 @@ public class PersonalizedAchievementController {
             return likeRepository.existsByPersonalizedAchievementIdAndUserId(personalizedAchievementIdL, uId);
         }else{
             throw new RuntimeException("El me gusta del logro personalizado no existe");
+        }
+    }
+
+    @GetMapping("/personalized-achievements/videogame/{videogameId}/ranking")
+    public List<PersonalizedAchievement> getPersonalizedAchievementsRanking(@PathVariable("videogameId") String videogameId) {
+        try {
+            Long videogameIdL = Long.parseLong(videogameId);
+
+            Optional<Videogame> OptVideogame = videogameRepository.findById(videogameIdL);
+
+            if(OptVideogame.isPresent()){
+                List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByVideogameId(videogameIdL);
+                personalizedAchievements.sort(Comparator.comparingInt(PersonalizedAchievement::getLikesNum).reversed());
+
+                return personalizedAchievements.subList(0, Math.min(10, personalizedAchievements.size()));
+            }else{
+                throw new RuntimeException("El no existe el videojuego");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
