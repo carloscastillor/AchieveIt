@@ -57,6 +57,17 @@ public class PersonalizedAchievementController {
         return personalizedAchievementRepository.findPersonalizedAchievementByVideogameId(id);
     }
 
+    @GetMapping("/personalized-achievements/user/{token}")
+    public List<PersonalizedAchievement> getPersonalizedAchievementFromUser(@PathVariable("token") String token) {
+
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long uId = Long.parseLong(userId);
+
+        return personalizedAchievementRepository.findPersonalizedAchievementByUserId(uId);
+    }
+
+
     @GetMapping("/personalized-achievements/videogame/{id}/user/{token}")
     public Set<Long> getUserPersonalizedAchievementsForGame(@PathVariable("id") String id, @PathVariable("token") String token) {
 

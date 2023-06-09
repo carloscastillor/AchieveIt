@@ -8,4 +8,6 @@ import java.util.List;
 public interface PersonalizedAchievementRepository extends JpaRepository<PersonalizedAchievement, Long> {
 
     List<PersonalizedAchievement> findPersonalizedAchievementByVideogameId(Long videogameId);
+
+    List<PersonalizedAchievement> findPersonalizedAchievementByUserId(Long userId);
 }
