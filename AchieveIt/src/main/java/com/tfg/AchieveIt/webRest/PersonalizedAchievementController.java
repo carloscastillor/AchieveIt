@@ -58,13 +58,22 @@ public class PersonalizedAchievementController {
     }
 
     @GetMapping("/personalized-achievements/user/{token}")
-    public List<PersonalizedAchievement> getPersonalizedAchievementFromUser(@PathVariable("token") String token) {
+    public Map<String, List<PersonalizedAchievement>> getPersonalizedAchievementFromUser(@PathVariable("token") String token) {
 
         Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
         String userId = claims.getSubject();
         Long uId = Long.parseLong(userId);
 
-        return personalizedAchievementRepository.findPersonalizedAchievementByUserId(uId);
+        List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByUserId(uId);
+
+        Map<String, List<PersonalizedAchievement>> result = new HashMap<>();
+
+        for(PersonalizedAchievement personalizedAchievement : personalizedAchievements){
+            String videogameName = personalizedAchievement.getVideogame().getName();
+            result.computeIfAbsent(videogameName, k -> new ArrayList<>()).add(personalizedAchievement);
+        }
+
+        return result;
     }
 
 
@@ -135,6 +144,16 @@ public class PersonalizedAchievementController {
         Long uId = Long.parseLong(userId);
 
         personalizedAchievementService.createPersonalizedAchievement(name, description, uId, videogameId);
+    }
+
+    @PostMapping("/personalized-achievements/update")
+    @Transactional
+    public void UpdatePersonalizedAchievement(@RequestBody Map<String, String> requestBody){
+        String name = requestBody.get("name");
+        String description = requestBody.get("description");
+        Long achievementId = Long.parseLong(requestBody.get("achievementId"));
+
+        personalizedAchievementService.updatePersonalizedAchievement(name, description, achievementId);
     }
 
     @PostMapping("/personalized-achievements/{personalizedAchievementId}/like/{token}")

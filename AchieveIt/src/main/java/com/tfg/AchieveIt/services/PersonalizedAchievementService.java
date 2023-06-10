@@ -70,4 +70,13 @@ public class PersonalizedAchievementService {
         personalizedAchievement.removeLike(like);
         likeRepository.delete(like);
     }
+
+    public void updatePersonalizedAchievement(String name, String description, Long achievementId) {
+        PersonalizedAchievement personalizedAchievement = personalizedAchievementRepository.findById(achievementId).get();
+
+        personalizedAchievement.setName(name);
+        personalizedAchievement.setDescription(description);
+
+        personalizedAchievementRepository.save(personalizedAchievement);
+    }
 }
