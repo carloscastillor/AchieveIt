@@ -76,6 +76,24 @@ public class PersonalizedAchievementController {
         return result;
     }
 
+    @GetMapping("/personalized-achievements/user/{token}/likes")
+    public Integer getAllLikesOfUser(@PathVariable("token") String token) {
+
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long uId = Long.parseLong(userId);
+
+        List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByUserId(uId);
+
+        int result = 0;
+        for(PersonalizedAchievement personalizedAchievement : personalizedAchievements){
+
+            result = result +personalizedAchievement.getLikesNum();
+        }
+
+        return result;
+    }
+
 
     @GetMapping("/personalized-achievements/videogame/{id}/user/{token}")
     public Set<Long> getUserPersonalizedAchievementsForGame(@PathVariable("id") String id, @PathVariable("token") String token) {

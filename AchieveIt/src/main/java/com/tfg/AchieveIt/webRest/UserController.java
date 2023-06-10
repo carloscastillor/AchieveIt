@@ -68,6 +68,23 @@ public class UserController {
         }
     }
 
+    @GetMapping("/users/{token}/videogamesTotal")
+    public Integer getUserVideogamesTotal(@PathVariable("token") String token) {
+
+        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+        String userId = claims.getSubject();
+        Long id = Long.parseLong(userId);
+
+        Optional<User> userOpt = userRepository.findById(id);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            return user.getVideogames().size();
+        } else {
+            throw new RuntimeException("El usuario no existe");
+        }
+    }
+
     @GetMapping("/users/{token}/recent-videogames")
     public List<Videogame> getRecentVideogames(@PathVariable("token") String token){
         Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
