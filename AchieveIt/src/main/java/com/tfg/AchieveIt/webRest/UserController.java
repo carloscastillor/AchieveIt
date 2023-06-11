@@ -39,8 +39,19 @@ public class UserController {
 
     @GetMapping("/users/{token}")
     public User getUser(@PathVariable("token") String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
-        String userId = claims.getSubject();
+        Long id = 0L;
+        if (userService.isTokenJwt(token)) {
+            Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+            String userId = claims.getSubject();
+            id = Long.parseLong(userId);
+        }else{
+            id = Long.parseLong(token);
+        }
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException());
+    }
+
+    @GetMapping("/users/id/{userId}")
+    public User getUserById(@PathVariable("userId") String userId) {
         Long id = Long.parseLong(userId);
 
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException());
@@ -71,9 +82,14 @@ public class UserController {
     @GetMapping("/users/{token}/videogamesTotal")
     public Integer getUserVideogamesTotal(@PathVariable("token") String token) {
 
-        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
-        String userId = claims.getSubject();
-        Long id = Long.parseLong(userId);
+        Long id = 0L;
+        if (userService.isTokenJwt(token)) {
+            Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+            String userId = claims.getSubject();
+            id = Long.parseLong(userId);
+        }else{
+            id = Long.parseLong(token);
+        }
 
         Optional<User> userOpt = userRepository.findById(id);
 

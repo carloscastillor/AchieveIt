@@ -111,4 +111,10 @@ public class UserService {
     public String getJwtSecret() {
         return base64SecretBytes;
     }
+
+    public boolean isTokenJwt(String token) {
+        // Expresión regular para verificar el formato de un token JWT
+        String jwtRegex = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$";
+        return token.matches(jwtRegex);
+    }
 }

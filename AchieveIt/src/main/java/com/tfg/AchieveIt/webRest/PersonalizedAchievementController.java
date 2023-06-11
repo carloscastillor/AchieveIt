@@ -52,6 +52,19 @@ public class PersonalizedAchievementController {
         personalizedAchievementRepository.deleteById(id);
     }
 
+    @GetMapping("/personalized-achievements/{id}/user")
+    public User getUserOfPersonalizedAchievement(@PathVariable("id") Long id) {
+
+        Optional<PersonalizedAchievement> OptPersonalizedAchievement =personalizedAchievementRepository.findById(id);
+
+        if(OptPersonalizedAchievement.isPresent()){
+            PersonalizedAchievement personalizedAchievement = OptPersonalizedAchievement.get();
+            User user = personalizedAchievement.getUser();
+            return user;
+        }
+
+        return null;
+    }
     @GetMapping("/personalized-achievements/videogame/{id}")
     public List<PersonalizedAchievement> getPersonalizedAchievementByVideogame(@PathVariable("id") Long id) {
         return personalizedAchievementRepository.findPersonalizedAchievementByVideogameId(id);
@@ -60,11 +73,16 @@ public class PersonalizedAchievementController {
     @GetMapping("/personalized-achievements/user/{token}")
     public Map<String, List<PersonalizedAchievement>> getPersonalizedAchievementFromUser(@PathVariable("token") String token) {
 
-        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
-        String userId = claims.getSubject();
-        Long uId = Long.parseLong(userId);
+        Long id = 0L;
+        if (userService.isTokenJwt(token)) {
+            Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+            String userId = claims.getSubject();
+            id = Long.parseLong(userId);
+        }else{
+            id = Long.parseLong(token);
+        }
 
-        List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByUserId(uId);
+        List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByUserId(id);
 
         Map<String, List<PersonalizedAchievement>> result = new HashMap<>();
 
@@ -79,11 +97,16 @@ public class PersonalizedAchievementController {
     @GetMapping("/personalized-achievements/user/{token}/likes")
     public Integer getAllLikesOfUser(@PathVariable("token") String token) {
 
-        Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
-        String userId = claims.getSubject();
-        Long uId = Long.parseLong(userId);
+        Long id = 0L;
+        if (userService.isTokenJwt(token)) {
+            Claims claims = Jwts.parserBuilder().setSigningKey(userService.getJwtSecret()).build().parseClaimsJws(token).getBody();
+            String userId = claims.getSubject();
+            id = Long.parseLong(userId);
+        }else{
+            id = Long.parseLong(token);
+        }
 
-        List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByUserId(uId);
+        List<PersonalizedAchievement> personalizedAchievements = personalizedAchievementRepository.findPersonalizedAchievementByUserId(id);
 
         int result = 0;
         for(PersonalizedAchievement personalizedAchievement : personalizedAchievements){

@@ -72,6 +72,7 @@ public class SteamApiClient {
             JsonObject appList = jsonObject.getAsJsonObject("applist");
             JsonArray apps = appList.getAsJsonArray("apps");
             int counter = 0;
+            int counterLimit = 0;
 
             for (JsonElement appElement : apps) {
                 JsonObject appObj = appElement.getAsJsonObject();
@@ -90,6 +91,7 @@ public class SteamApiClient {
 
                     System.out.print(counter + ": ");
                     counter++;
+                    counterLimit++;
 
                     HttpResponse<String> appDetailsResponse = httpClient.send(appDetailsRequest, HttpResponse.BodyHandlers.ofString());
                     String appDetailsResponseBody = appDetailsResponse.body();
@@ -111,6 +113,8 @@ public class SteamApiClient {
 
                     gameCache.put(appId, appDetailsResponseBody);
                 }
+
+                if(counterLimit == 1000){break;}
 
                 if(counter == 200){
                     Thread.sleep(5 * 60 * 1000);

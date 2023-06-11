@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface VideogameRepository extends JpaRepository<Videogame, Long> {
-    Videogame findVideogameByName(String name);
+    List<Videogame> findVideogameByName(String name);
 
     List<Videogame> findVideogamesByGenres(Genre genre);
 

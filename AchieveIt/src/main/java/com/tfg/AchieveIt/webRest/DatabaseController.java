@@ -9,6 +9,7 @@ import com.tfg.AchieveIt.repository.*;
 import com.tfg.AchieveIt.services.AchievementStatsApiClient;
 import com.tfg.AchieveIt.services.IGDBApiClient;
 import com.tfg.AchieveIt.services.SteamApiClient;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -153,34 +154,45 @@ public class DatabaseController {
     }
 
     private void FillAchievements() {
-        //List<SteamApiClient.VideogameSteam> videogameSteamList = steamApiClient.searchGames();
+        List<SteamApiClient.VideogameSteam> videogameSteamList = steamApiClient.searchGames();
+        for (SteamApiClient.VideogameSteam videogameSteam : videogameSteamList) {
+            List<Videogame> videogamesBd = videogameRepository.findVideogameByName(videogameSteam.getName());
+            if(videogamesBd.size()==1){
+                Videogame videogameBd = videogamesBd.get(0);
+                if(videogameBd != null) {
+                    JsonArray achievements = steamApiClient.searchAchievements(videogameSteam.getAppId());
+                    //Videogame videogameBd = videogameRepository.findVideogameByName("The Binding of Isaac: Rebirth");
+                    //JsonArray achievements = steamApiClient.searchAchievements("250900");
+                    if(achievements != null) {
+                        for (JsonElement achievementElement : achievements) {
+                            JsonObject achievementSt = achievementElement.getAsJsonObject();
+                            if (!achievementSt.isEmpty()) {
 
-        //for (SteamApiClient.VideogameSteam videogameSteam : videogameSteamList) {
-            //Videogame videogameBd = videogameRepository.findVideogameByName(videogameSteam.getName());
-            //JsonArray achievements = steamApiClient.searchAchievements(videogameSteam.getAppId());
-            Videogame videogameBd = videogameRepository.findVideogameByName("The Binding of Isaac: Rebirth");
-            JsonArray achievements = steamApiClient.searchAchievements("250900");
 
-            for (JsonElement achievementElement : achievements) {
-                JsonObject achievementSt = achievementElement.getAsJsonObject();
+                                String name = achievementSt.get("displayName").getAsString();
+                                String description = "The achievement has no description";
+                                if (achievementSt.has("description")) {
+                                    description = achievementSt.get("description").getAsString();
+                                }
 
+                                Achievement achievement = new Achievement();
+                                achievement.setName(name);
+                                achievement.setDescription(description);
+                                achievement.setVideogame(videogameBd);
+                                achievementRepository.save(achievement);
 
-                String name = achievementSt.get("displayName").getAsString();
-                String description = "The achievement has no description";
-                if (achievementSt.has("description")) {
-                    description = achievementSt.get("description").getAsString();
+                                videogameBd.getAchievements().add(achievement);
+
+                                System.out.println("\tGame name: " + videogameBd.getName() + " Achievement añadido: " + achievement.getName());
+                            }
+                        }
+                    }
+                }else{
+                    System.out.println("No existe el videojuego: " + videogameSteam.getName());
                 }
-
-                Achievement achievement = new Achievement();
-                achievement.setName(name);
-                achievement.setDescription(description);
-                achievement.setVideogame(videogameBd);
-                achievementRepository.save(achievement);
-
-                videogameBd.getAchievements().add(achievement);
-
-                System.out.println("Game name: " + videogameBd.getName() + " Achievement añadido: " + achievement.getName());
+            }else {
+                System.out.println("hay mas de un videojuego con el nombre: " + videogameSteam.getName());
             }
-        //}
+        }
     }
 }
