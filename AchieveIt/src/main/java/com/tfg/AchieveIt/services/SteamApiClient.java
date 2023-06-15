@@ -19,9 +19,15 @@ public class SteamApiClient {
 
     private Cache<String, String> gameCache;
 
+    private Cache<String,Integer> counterCache;
+
     public SteamApiClient() {
         this.gameCache = Caffeine.newBuilder()
                 .maximumSize(Long.MAX_VALUE)
+                .build();
+
+        this.counterCache = Caffeine.newBuilder()
+                .maximumSize(1)
                 .build();
     }
 
@@ -72,7 +78,10 @@ public class SteamApiClient {
             JsonObject appList = jsonObject.getAsJsonObject("applist");
             JsonArray apps = appList.getAsJsonArray("apps");
             int counter = 0;
-            int counterLimit = 0;
+            Integer counterLimit = counterCache.getIfPresent("counterLimit");
+            if (counterLimit == null) {
+                counterLimit = 0;
+            }
 
             for (JsonElement appElement : apps) {
                 JsonObject appObj = appElement.getAsJsonObject();
@@ -89,7 +98,7 @@ public class SteamApiClient {
                             .GET()
                             .build();
 
-                    System.out.print(counter + ": ");
+                    System.out.print(counterLimit + ": ");
                     counter++;
                     counterLimit++;
 
@@ -112,9 +121,10 @@ public class SteamApiClient {
                     }
 
                     gameCache.put(appId, appDetailsResponseBody);
+                    counterCache.put("counterLimit", counterLimit);
                 }
 
-                if(counterLimit == 1000){break;}
+                if(counterLimit == 50000){break;}
 
                 if(counter == 200){
                     Thread.sleep(5 * 60 * 1000);
